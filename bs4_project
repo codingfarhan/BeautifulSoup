@@ -1,0 +1,39 @@
+import bs4
+
+from urllib.request import urlopen as ureq
+
+from bs4 import BeautifulSoup as soup
+
+#The url
+
+my_url = 'https://www.newegg.com/global/in-en/p/pl?d=mobile+phones'
+
+uclient = ureq(my_url)
+
+page_html = uclient.read()
+
+uclient.close()
+
+page_soup = soup(page_html, "html.parser")
+
+containers = page_soup.findAll("div",{"class":"item-container"})
+
+#Now i want to loop through the 'item-container' objects and savs the brand name and price to a csv file
+
+#But this is what printing "containers[0]" is giving :
+
+# <div class="item-container" data-itemnumber="75-212-415">
+#    <a class="item-img" href="https://www.newegg.com/global/in-en/p/N82E16875212415?cm_sp=SearchSuccess-_-INFOCARD-_-mobile+phones-_-75-212-415-_-1&amp;Description=mobile+phones">
+#    <img -="" 32gb="" alt="Sony Xperia XA2 Ultra 6.0" gold="" smartphone="" src="//c1.neweggimages.com/ProductImageCompressAll300/75-212-415-V13.jpg" title="Sony Xperia XA2 Ultra 6.0" unlocked="" us="" warranty"=""/>
+#    </a>
+#    <div class="item-info">
+#       <div class="item-branding">
+#          <a class="item-rating" href="https://www.newegg.com/global/in-en/p/N82E16875212415?cm_sp=SearchSuccess-_-INFOCARD-_-mobile+phones-_-75-212-415-_-1&amp;Description=mobile+phones&amp;IsFeedbackTab=true#scrollFullInfo"><i class="rating rating-5"></i><span class="item-rating-num">(1)</span></a>
+#       </div>
+#       <a class="item-title" href="https://www.newegg.com/global/in-en/p/N82E16875212415?cm_sp=SearchSuccess-_-INFOCARD-_-mobile+phones-_-75-212-415-_-1&amp;Description=mobile+phones">
+#       Sony Xperia XA2 Ultra 6.0" Unlocked Smartphone - 32GB - Gold US Warranty
+#       </a>
+#    </div>
+# </div>
+
+#This is incomplete. I won't be able to extract price of each items.
