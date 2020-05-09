@@ -1,0 +1,46 @@
+#This program prints top 10 IMDb movies and stores them in a csv file
+
+
+
+from bs4 import BeautifulSoup
+
+import requests
+
+import csv
+
+url = "https://www.imdb.com/chart/top/?ref_=nv_mv_250"
+
+r = requests.get(url)
+
+htmlcontent = r.content
+
+soup = BeautifulSoup(htmlcontent,'html.parser')
+
+movie_containers = soup.find_all('tr')
+
+
+movie_containers.pop(0)
+
+out_filename = "movies.csv"
+
+headers = 'Movie Name,Director And Actors, Rating \n'
+
+f = open(out_filename, "w")
+
+f.write(headers)
+
+
+for index, movie_container in enumerate(movie_containers, start=1):
+    
+    movie_name = movie_container.find("td","titleColumn").a.string
+    dir_act = movie_container.find("td","titleColumn").a["title"]
+    ratings = movie_container.find("td","ratingColumn imdbRating").strong.string
+
+    f.write(movie_name+','+dir_act.replace(',','|')+','+ratings+"\n")
+
+    if index==10:
+        break
+    else:
+        continue
+
+f.close()
