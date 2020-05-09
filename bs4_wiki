@@ -1,0 +1,32 @@
+#program to print top 3 most populated australian cities
+
+from bs4 import BeautifulSoup
+
+import csv
+
+url = "https://en.wikipedia.org/wiki/List_of_cities_in_Australia_by_population#50_largest_urban_centres_by_population"
+
+r = requests.get(url)
+
+htmlcontent = r.content
+
+soup = BeautifulSoup(htmlcontent,'html.parser')
+
+city_containers = soup.find_all("tr")
+
+city_containers.pop(0)
+
+for city in city_containers:
+    
+    index = city.td.string
+    
+    city_name = city.td.find_next_sibling("td").b.a.string
+    
+    population = city.td.find_next_siblings("td",style="text-align:right")[0].string
+    
+    perc_nat = city.td.find_next_siblings("td",style="text-align:right")[2].string
+    
+    print(index,city_name,population,perc_nat)
+    
+    if index==3:
+        break
