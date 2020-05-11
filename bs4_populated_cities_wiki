@@ -1,5 +1,7 @@
 #program to print top 3 most populated australian cities
 
+import requests
+
 from bs4 import BeautifulSoup
 
 import csv
@@ -12,21 +14,39 @@ htmlcontent = r.content
 
 soup = BeautifulSoup(htmlcontent,'html.parser')
 
+outfilename = "Pop_Cities_AUS.csv"
+
+headers = "Rank,City,Estimated Population,Percentage of National Population \n"
+
+f = open(outfilename, "w")
+
+f.write(headers)
+
 city_containers = soup.find_all("tr")
 
 city_containers.pop(0)
 
-for city in city_containers:
+for index, city in enumerate(city_containers, start=1):
     
-    index = city.td.string
     
-    city_name = city.td.find_next_sibling("td").b.a.string
+    num = city.td.string
+    
+    if int(num)>5:
+        city_name = city.td.find_next_sibling("td").a.string
+    
+    elif int(num)<=5:
+        city_name = city.td.find_next_sibling("td").b.a.string
+    
     
     population = city.td.find_next_siblings("td",style="text-align:right")[0].string
     
     perc_nat = city.td.find_next_siblings("td",style="text-align:right")[2].string
+   
+    f.write(num+','+city_name+','+population.replace(',','.')+','+perc_nat+'\n')
     
-    print(index,city_name,population,perc_nat)
-    
-    if index==3:
+     
+    if index==2:
         break
+
+
+f.close()
