@@ -1,0 +1,69 @@
+from bs4 import BeautifulSoup
+
+import requests
+
+import pandas as pd
+
+
+url = "https://www.amazon.in/gp/bestsellers/sports/3403983031?ref_=Oct_BSellerC_3403983031_SAll&pf_rd_p=326d099a-6fb3-50b9-bb53-de6945743094&pf_rd_s=merchandised-search-5&pf_rd_t=101&pf_rd_i=3403983031&pf_rd_m=A1VBAL9TL5WCBF&pf_rd_r=QFZ1N8ZRPTC8FZKWG5FM&pf_rd_r=QFZ1N8ZRPTC8FZKWG5FM&pf_rd_p=326d099a-6fb3-50b9-bb53-de6945743094"
+
+r = requests.get(url)
+
+html_content = r.content
+
+soup = BeautifulSoup(html_content,'html.parser')
+
+item_containers = soup.find('ol','a-ordered-list a-vertical').contents         #find_all("li",class_="zg-item-immersion")
+
+
+l1 = []
+l2 = []
+l3 = []
+l101 = []
+
+for index, item in enumerate(item_containers, start=1):
+    
+    if index==5:
+        index-=1
+        continue
+   
+    else:
+        
+        item_name = item.span.div.find("span","aok-inline-block zg-item").a.span.div.img["alt"]        #img["alt"]
+        rating = item.span.div.find("span","aok-inline-block zg-item").find("div","a-icon-row a-spacing-none").a["title"]     
+        #price1 = item.span.div.find("span","aok-inline-block zg-item").find("div","a-row").a.span.span.string 
+        
+        try:    
+            price2 = item.span.div.find("span","aok-inline-block zg-item").find("div","a-row").a.span.span.find_next_sibling("span").string
+        except AttributeError:
+            price = price1
+        
+        if item.span.div.find("span","aok-inline-block zg-item").find("div","a-row")==None:
+            price = item.span.div.find("span","aok-inline-block zg-item").find("a","a-link-normal a-text-normal").span.span.span.string
+        else:
+            price1 = item.span.div.find("span","aok-inline-block zg-item").find("div","a-row").a.span.span.string 
+        
+        
+        if price2==None:
+            price = price1
+        else:
+            price = price1+' to '+price2
+
+        print(index, item_name, rating, price)
+        
+        l1.append(item_name)
+        l2.append(rating)
+        
+
+        l3.append(price)
+        
+        l101.append(index)
+    
+    if index==16:
+        break
+
+    dict = {'Index':l101, 'Item_Name':l1, 'Rating':l2, 'Price':l3}
+
+df = pd.DataFrame(dict)
+
+df.to_csv('Amazon.csv', index=False)
