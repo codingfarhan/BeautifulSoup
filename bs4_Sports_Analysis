@@ -1,0 +1,49 @@
+from bs4 import BeautifulSoup
+
+import requests
+
+import pandas as pd 
+
+
+url = 'https://www.soccerbase.com/players/player.sd?player_id=50603'
+
+r = requests.get(url)
+
+html_content = r.content
+
+soup = BeautifulSoup(html_content, 'html.parser')
+
+containers = soup.find("table", "soccerGrid listWithCards").contents[1].find_all("tr", class_="match")
+
+# print(containers)
+
+
+l1 = []
+l2 = []
+
+
+for container in containers:
+	
+	goal_scored = container.find_all("td")[6].div.span
+	
+	if goal_scored == None:
+		
+		goal_scored = 0
+	
+	else:
+	
+		goal_scored = goal_scored.string
+	
+	date = container.find("td", "dateTime").span.a["title"]
+
+	l1.append(goal_scored)
+	l2.append(date) 
+
+	print(date, goal_scored)
+
+
+dict = {'Date':l2, 'Goals':l1}
+
+df = pd.DataFrame(dict)
+
+df.to_csv('Lewandowski_goals.csv', index=False)
